@@ -1,0 +1,6 @@
+@InquistiveAI_Api_HostAddress = http://localhost:5229
+
+GET {{InquistiveAI_Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
