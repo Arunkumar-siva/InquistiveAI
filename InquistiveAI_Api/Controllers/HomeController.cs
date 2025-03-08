@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using InquistiveAI_Library.DTO;
+using InquistiveAI_Library.Interface;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,6 +10,13 @@ namespace InquistiveAI_Api.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
+
+        private readonly IHomeRepository _homeRepository;
+
+        public HomeController(IHomeRepository homeRepository)
+        {
+            this._homeRepository = homeRepository;
+        }
         // GET: api/<HomeController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -22,11 +31,6 @@ namespace InquistiveAI_Api.Controllers
             return "value";
         }
 
-        // POST api/<HomeController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
 
         // PUT api/<HomeController>/5
         [HttpPut("{id}")]
@@ -38,6 +42,17 @@ namespace InquistiveAI_Api.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginDto loginDto)
+        {
+            var response = await this._homeRepository.CheckUserCredentials(loginDto);
+            if (response != null)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
     }
 }
