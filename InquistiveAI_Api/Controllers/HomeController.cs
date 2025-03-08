@@ -1,6 +1,8 @@
 ﻿using InquistiveAI_Library.DTO;
+using InquistiveAI_Library.Exceptions;
 using InquistiveAI_Library.Interface;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -44,15 +46,31 @@ namespace InquistiveAI_Api.Controllers
         {
         }
 
-        [HttpPost]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var response = await this._homeRepository.CheckUserCredentials(loginDto);
-            if (response != null)
+            try
             {
-                return Ok(response);
+                var response = await _homeRepository.CheckUserCredentials(loginDto);
+                return Ok(response); 
             }
-            return BadRequest(response);
+            catch (InvalidCredentialsException exception) 
+            {
+                return Unauthorized(new
+                {
+                    Message = exception.Message, 
+                    ErrorCode = "INVALID CREDENTIALS"
+                });
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "An unexpected error occurred.",
+                    Error = exception.Message 
+                });
+            }
         }
+
     }
 }

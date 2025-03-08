@@ -1,6 +1,7 @@
 ﻿using InquisitiveAiLibrary.Model;
 using InquistiveAI_Library.Context;
 using InquistiveAI_Library.DTO;
+using InquistiveAI_Library.Exceptions;
 using InquistiveAI_Library.Interface;
 using InquistiveAI_Library.Model;
 using Microsoft.EntityFrameworkCore;
@@ -22,26 +23,27 @@ namespace InquistiveAI_Library.Repository
         }
         public async Task<EmployeeDetails> CheckUserCredentials(LoginDto login)
         {
-            var employeeData = await this._context.Login.FirstOrDefaultAsync(employee => employee.AceId == login.AceId && employee.Password == login.Password);
-            if (employeeData != null)
-            {
-                var employeeDetails = await this._context.EmployeeDetails
-                                      .Where(employee => employee.AceId == employeeData.AceId)
-                                      .Include(employee => employee.BatchDetails)
-                                      .Include(employee => employee.Roles)
-                                      .Include(employee => employee.EmployeeAssessmentDetails)
-                                      .FirstOrDefaultAsync();  // ✅ Throws an exception if multiple records exist
-                if (employeeDetails != null)
+             var employeeData = await this._context.Login.SingleOrDefaultAsync(employee => employee.AceId == login.AceId && employee.Password == login.Password);
+                if (employeeData != null)
                 {
-                    return employeeDetails;
+                    var employeeDetails = await this._context.EmployeeDetails
+                                          .Where(employee => employee.AceId == employeeData.AceId)
+                                          .Include(employee => employee.BatchDetails)
+                                          .Include(employee => employee.Roles)
+                                          .Include(employee => employee.EmployeeAssessmentDetails)
+                                          .SingleOrDefaultAsync();  // ✅ Throws an exception if multiple records exist
+                    if (employeeDetails != null)
+                    {
+                        return employeeDetails;
+                    }
+
+                    throw new InvalidCredentialsException("Unable to get Data ");
+
+
                 }
-
-
+                throw new InvalidCredentialsException("Invalid Login Credentials");
 
             }
-
-            return null;
-
-        }
+        
     }
 }

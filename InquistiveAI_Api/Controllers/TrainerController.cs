@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using InquistiveAI_Library.DTO;
+using InquistiveAI_Library.Interface;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,6 +10,12 @@ namespace InquistiveAI_Api.Controllers
     [ApiController]
     public class TrainerController : ControllerBase
     {
+
+        private readonly IUnitOfWork _unitOfWork;
+        public TrainerController(IUnitOfWork unitOfWork)
+        {
+            this._unitOfWork = unitOfWork;
+        }
         // GET: api/<TrainerController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -23,9 +31,20 @@ namespace InquistiveAI_Api.Controllers
         }
 
         // POST api/<TrainerController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("AddBatch")]
+        public async Task<ActionResult> AddNewBatch([FromBody] BatchDetailsDto batchDetailsDto)
         {
+            try
+            {
+                var response = await this._unitOfWork.Trainer.AddNewBatchAsync(batchDetailsDto);
+                await this._unitOfWork.CommitAsync();
+                return Ok($"{response} added Successfully");
+
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
         }
 
         // PUT api/<TrainerController>/5
