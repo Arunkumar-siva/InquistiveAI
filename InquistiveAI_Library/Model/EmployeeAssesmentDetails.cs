@@ -18,7 +18,7 @@ namespace InquistiveAI_Library.Model
         
         public string AceId { get; set; }
 
-        
+        [Required]
         public int BatchId { get; set; }
 
         public int AssessmentId { get; set; }
