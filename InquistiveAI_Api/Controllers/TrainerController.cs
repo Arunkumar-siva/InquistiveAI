@@ -1,8 +1,9 @@
 ﻿using InquistiveAI_Library.DTO;
+using InquistiveAI_Library.Exceptions;
 using InquistiveAI_Library.Interface;
+using InquistiveAI_Library.Model;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace InquistiveAI_Api.Controllers
 {
@@ -16,29 +17,19 @@ namespace InquistiveAI_Api.Controllers
         {
             this._unitOfWork = unitOfWork;
         }
-        // GET: api/<TrainerController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
-        // GET api/<TrainerController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<TrainerController>
-        [HttpPost("AddBatch")]
+        [HttpPost("AddNewBatch")]
         public async Task<ActionResult> AddNewBatch([FromBody] BatchDetailsDto batchDetailsDto)
         {
             try
             {
                 var response = await this._unitOfWork.Trainer.AddNewBatchAsync(batchDetailsDto);
-                await this._unitOfWork.CommitAsync();
-                return Ok($"{response} added Successfully");
+                if (response)
+                {
+                    await this._unitOfWork.CommitAsync();
+                    return Ok($"{batchDetailsDto.BatchName} added Successfully");
+                }
+                return Ok($"{batchDetailsDto.BatchName} already Exists");
 
             }
             catch (Exception exception)
@@ -47,16 +38,65 @@ namespace InquistiveAI_Api.Controllers
             }
         }
 
-        // PUT api/<TrainerController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+
+
+        [HttpGet("GetAllBatches")]
+
+        public async Task<ActionResult> GetAllBatches()
         {
+            var response = await this._unitOfWork.Trainer.GetAllBatchesAsync();
+
+            if (response != null)
+            {
+                return Ok(response);
+
+            }
+            return new NoContentResult();
+
         }
 
-        // DELETE api/<TrainerController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPut("EditBatchDetail/{batchId}")]
+
+        public async Task<IActionResult> UpdateBatchDetails(int batchId, [FromBody] BatchDetailsDto batchDetails)
         {
+            try
+            {
+                var response = await this._unitOfWork.Trainer.UpdateBatchDetailsAsync(batchId, batchDetails);
+                if (response)
+                {
+                    await this._unitOfWork.CommitAsync();
+                    return Ok($"{batchDetails.BatchName} Updated Successfully");
+                }
+
+                return NotFound($"{batchDetails.BatchName} not Found");
+            }
+            catch (BatchNotFoundException exception)
+            {
+                return NotFound(exception.Message);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, new { error = "An Unexpexted Error Occured", details = exception.Message });
+            }
+
+        }
+
+        [HttpPost("UploadAssessment")]
+
+        public async Task<IActionResult> UploadAssessment([FromForm] AssessmentDetailDto assessmentDetailDto)
+        {
+            if( assessmentDetailDto.AssessmentFile == null || assessmentDetailDto.AssessmentFile.Length == 0)
+            {
+                return BadRequest("No File Uploaded");
+            }
+
+            var response = this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
+            if(response)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
     }
 }

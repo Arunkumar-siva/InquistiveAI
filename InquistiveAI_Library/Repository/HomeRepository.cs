@@ -1,4 +1,5 @@
 ﻿using InquisitiveAiLibrary.Model;
+using InquistiveAI_Library.Constants;
 using InquistiveAI_Library.Context;
 using InquistiveAI_Library.DTO;
 using InquistiveAI_Library.Exceptions;
@@ -21,29 +22,60 @@ namespace InquistiveAI_Library.Repository
         {
             this._context = context;
         }
-        public async Task<EmployeeDetails> CheckUserCredentials(LoginDto login)
+        public async Task<UserdetailsDto> CheckUserCredentials(LoginDto login)
         {
-             var employeeData = await this._context.Login.SingleOrDefaultAsync(employee => employee.AceId == login.AceId && employee.Password == login.Password);
-                if (employeeData != null)
+            var employeeData = await this._context.Login.SingleOrDefaultAsync(employee => employee.AceId == login.AceId && employee.Password == login.Password);
+            if (employeeData != null)
+            {
+
+                var employeeDetails = await this._context.EmployeeDetails
+                                      .Where(employee => employee.AceId == employeeData.AceId)
+                                      .SingleOrDefaultAsync();  // ✅ Throws an exception if multiple records exist
+                if (employeeDetails != null)
                 {
-                    var employeeDetails = await this._context.EmployeeDetails
-                                          .Where(employee => employee.AceId == employeeData.AceId)
-                                          .Include(employee => employee.BatchDetails)
-                                          .Include(employee => employee.Roles)
-                                          .Include(employee => employee.EmployeeAssessmentDetails)
-                                          .SingleOrDefaultAsync();  // ✅ Throws an exception if multiple records exist
-                    if (employeeDetails != null)
+                    if (employeeDetails.RoleId == ConstantClass.trainer)
                     {
-                        return employeeDetails;
+                        var userDetails = new UserdetailsDto
+                        {
+                            AceId = employeeDetails.AceId,
+                            EmployeeName = employeeDetails.EmployeeName,
+                            UserRole = ConstantClass.trainerRole
+                        };
+
+                        return userDetails;
+                    }
+                    else
+                    {
+                        if (employeeDetails.RoleId == ConstantClass.fresher)
+                        {
+                            var userDetails = new UserdetailsDto
+                            {
+                                AceId = employeeDetails.AceId,
+                                EmployeeName = employeeDetails.EmployeeName,
+                                UserRole = ConstantClass.fresherRole
+                            };
+                            return userDetails;
+                        }
+                        else
+                        {
+                            var userDetails = new UserdetailsDto
+                            {
+                                AceId = employeeDetails.AceId,
+                                EmployeeName = employeeDetails.EmployeeName,
+                                UserRole = ConstantClass.employeeRole
+                            };
+                            return userDetails;
+                        }
                     }
 
-                    throw new InvalidCredentialsException("Unable to get Data ");
-
-
                 }
-                throw new InvalidCredentialsException("Invalid Login Credentials");
+
+                throw new InvalidCredentialsException("Unable to get Data ");
 
             }
-        
+            throw new InvalidCredentialsException("Invalid Login Credentials");
+
+        }
+
     }
 }

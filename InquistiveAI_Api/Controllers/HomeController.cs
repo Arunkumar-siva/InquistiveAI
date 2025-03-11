@@ -19,32 +19,7 @@ namespace InquistiveAI_Api.Controllers
         {
             this._homeRepository = homeRepository;
         }
-        // GET: api/<HomeController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<HomeController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-
-        // PUT api/<HomeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<HomeController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDto loginDto)

@@ -10,6 +10,6 @@ namespace InquistiveAI_Library.Interface
 {
     public interface IHomeRepository
     {
-        Task<EmployeeDetails> CheckUserCredentials(LoginDto login);
+        Task<UserdetailsDto> CheckUserCredentials(LoginDto login);
     }
 }
