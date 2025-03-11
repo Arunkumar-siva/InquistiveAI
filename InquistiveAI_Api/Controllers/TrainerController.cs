@@ -81,22 +81,22 @@ namespace InquistiveAI_Api.Controllers
 
         }
 
-        [HttpPost("UploadAssessment")]
+        // [HttpPost("UploadAssessment")]
 
-        public async Task<IActionResult> UploadAssessment([FromForm] AssessmentDetailDto assessmentDetailDto)
-        {
-            if( assessmentDetailDto.AssessmentFile == null || assessmentDetailDto.AssessmentFile.Length == 0)
-            {
-                return BadRequest("No File Uploaded");
-            }
+        // public async Task<IActionResult> UploadAssessment([FromForm] AssessmentDetailDto assessmentDetailDto)
+        // {
+        //     if( assessmentDetailDto.AssessmentFile == null || assessmentDetailDto.AssessmentFile.Length == 0)
+        //     {
+        //         return BadRequest("No File Uploaded");
+        //     }
 
-            var response = this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
-            if(response)
-            {
-                return Ok();
-            }
+        //     // var response = this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
+        //     // if(response)
+        //     // {
+        //     //     return Ok();
+        //     // }
 
-            return BadRequest();
-        }
+        //     return BadRequest();
+        // }
     }
 }

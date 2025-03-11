@@ -33,5 +33,6 @@ namespace InquistiveAI_Library.Model
         public virtual BatchDetails BatchDetails { get; set; } 
 
         public virtual ICollection<EmployeeAssesmentDetails> EmployeeAssesments { get; set; }
+    
     }
 }

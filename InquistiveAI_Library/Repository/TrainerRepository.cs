@@ -4,7 +4,6 @@ using InquistiveAI_Library.Exceptions;
 using InquistiveAI_Library.Interface;
 using InquistiveAI_Library.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
