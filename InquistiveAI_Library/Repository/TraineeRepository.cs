@@ -27,10 +27,6 @@ namespace InquistiveAI_Library.Repository
                 .Include(employee => employee.BatchDetails)
                 .FirstOrDefaultAsync(employee => employee.AceId == aceId);
 
-            var employeeAssessment = await this._context.EmployeeAssesmentDetails
-                .Where(record => record.AceId == aceId)
-                .ToListAsync();
-
             if (employeeData != null)
             {
                 var employeeRecord = new EmployeeDetailsDto
@@ -39,13 +35,7 @@ namespace InquistiveAI_Library.Repository
                     EmployeeName = employeeData.EmployeeName,
                     RoleId = employeeData.RoleId,
                     BatchId = employeeData.BatchId,
-                    EmployeeAssessment = employeeAssessment.Select(a => new EmployeeAssessmentDto
-                    {
-                        AssessmentId = a.AssessmentId,
-                        Status = a.Status,
-                        AssessmentSubmissionDate = a.AssessmentSubmissionDate,
-                        Result = a.Result
-                    }).ToList()
+                    
                 };
 
                 return employeeRecord;
