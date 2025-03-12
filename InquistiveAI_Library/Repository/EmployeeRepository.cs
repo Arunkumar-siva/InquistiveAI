@@ -22,6 +22,7 @@ namespace InquistiveAI_Library.Repository
             _context = context;
         }
 
+        // Creates a new employee and their login entry
         public async Task<EmployeeDetails> CreateEmployee(EmployeeDetailsDto employeeDto)
         {
             // Generate a random password
@@ -51,6 +52,7 @@ namespace InquistiveAI_Library.Repository
             return employee;
         }
 
+        // Retrieves employees based on optional filters (batchId, roleId)
         public async Task<IEnumerable<EmployeeDetails>> GetEmployees(int? batchId, int? roleId)
         {
             return await _context.EmployeeDetails
@@ -59,17 +61,20 @@ namespace InquistiveAI_Library.Repository
                 .ToListAsync();
         }
 
+        // Fetches an employee by their unique AceId
         public async Task<EmployeeDetails> GetEmployeeByAceId(string aceId)
         {
             return await _context.EmployeeDetails.FirstOrDefaultAsync(e => e.AceId == aceId);
         }
 
+         // Updates an existing employee's information
         public async Task<EmployeeDetails> UpdateEmployee(string aceId, EmployeeDetailsDto updateDto)
         {
             var employee = await _context.EmployeeDetails.FirstOrDefaultAsync(e => e.AceId == aceId);
             if (employee == null)
                 return null;
 
+            // Update employee properties
             employee.EmployeeName = updateDto.EmployeeName;
             employee.BatchId = updateDto.BatchId;
             employee.RoleId = updateDto.RoleId;
@@ -78,6 +83,7 @@ namespace InquistiveAI_Library.Repository
             return employee;
         }
 
+        // Deletes an employee by AceId, returns true if successful
         public async Task<bool> DeleteEmployee(string aceId)
         {
             var employee = await _context.EmployeeDetails.FirstOrDefaultAsync(e => e.AceId == aceId);
