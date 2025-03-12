@@ -10,7 +10,7 @@ namespace InquistiveAI_Library.Interface
 {
     public interface IEmployeeRepository
     {
-        Task<EmployeeDetails> CreateEmployee(EmployeeDetailsDto employeeDto);
+        Task<bool> CreateEmployee(EmployeeDetailsDto employeeDto);
         Task<IEnumerable<EmployeeDetails>> GetEmployees(int? batchId, int? roleId);
         Task<EmployeeDetails> GetEmployeeByAceId(string aceId);
         Task<EmployeeDetails> UpdateEmployee(string aceId, EmployeeDetailsDto updateDto);

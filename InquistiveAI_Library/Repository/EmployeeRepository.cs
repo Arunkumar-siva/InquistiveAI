@@ -9,6 +9,8 @@ using InquistiveAI_Library.Model;
 using InquistiveAI_Library.Context;
 using InquistiveAI_Library.Helpers;
 using Microsoft.EntityFrameworkCore;
+using InquistiveAI_Library.Constants;
+using InquistiveAI_Library.Exceptions;
 
 
 
@@ -24,7 +26,7 @@ namespace InquistiveAI_Library.Repository
         }
 
         // Creates a new employee and their login entry
-        public async Task<EmployeeDetails> CreateEmployee(EmployeeDetailsDto employeeDto)
+        public async Task<bool> CreateEmployee(EmployeeDetailsDto employeeDto)
         {
             // Generate a random password
             string randomPassword = PasswordHelper.GenerateRandomPassword();
@@ -48,7 +50,36 @@ namespace InquistiveAI_Library.Repository
             };
 
             await _context.Login.AddAsync(login);
-            return employee;
+
+            if (employeeDto.RoleId == ConstantClass.fresher)
+            {
+                int assessmentId = await this._context.AssesmentDetails
+                .Where(assessment => assessment.BatchId == employeeDto.BatchId)
+                .Select(assessment => assessment.Id)
+                .FirstOrDefaultAsync();
+
+                if(assessmentId != 0)
+                {
+                    var employeeAssessmentDetails = new EmployeeAssesmentDetails
+                    {
+                        AceId = employeeDto.AceId,
+                        BatchId = employeeDto.BatchId,
+                        AssessmentId = assessmentId,
+                        Status = ConstantClass.assessmentPending,
+                        Result = ConstantClass.assessmentResult,
+
+                    };
+
+                    await _context.EmployeeAssesmentDetails.AddAsync(employeeAssessmentDetails);
+
+                    return true;
+
+                }  
+                throw new AssessmentNotFoundException($"Assessment not Uploaded for this Employee Batch {employeeDto.BatchId}. Unable to Add New Employee");
+            }
+             
+            return false;
+            
         }
 
         // Retrieves employees based on optional filters (batchId, roleId)
@@ -66,7 +97,7 @@ namespace InquistiveAI_Library.Repository
             return await _context.EmployeeDetails.FirstOrDefaultAsync(e => e.AceId == aceId);
         }
 
-         // Updates an existing employee's information
+        // Updates an existing employee's information
         public async Task<EmployeeDetails> UpdateEmployee(string aceId, EmployeeDetailsDto updateDto)
         {
             var employee = await _context.EmployeeDetails.FirstOrDefaultAsync(e => e.AceId == aceId);

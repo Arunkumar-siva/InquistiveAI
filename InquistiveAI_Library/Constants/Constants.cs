@@ -17,5 +17,12 @@ namespace InquistiveAI_Library.Constants
         public const string fresherRole = "Fresher";
 
         public const string employeeRole = "Employee";
+
+        public const bool assessmentPending = true;
+
+        public const string assessmentResult = "Assessment not Completed";
+
+
+
     }
 }

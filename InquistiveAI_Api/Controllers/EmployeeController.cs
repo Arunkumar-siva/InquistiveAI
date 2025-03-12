@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using InquistiveAI_Library.DTO;
 using InquistiveAI_Library.Interface;
+using InquistiveAI_Library.Exceptions;
 
 // API Controller to handle Employee-related operations
 namespace InquistiveAI_Api.Controllers
@@ -27,18 +28,21 @@ namespace InquistiveAI_Api.Controllers
             try
             {
                 // Attempt to create a new employee record
-                var employee = await _unitOfWork.Employee.CreateEmployee(employeeDto);
-
-                // If creation fails, return a BadRequest response
-                if (employee == null)
+                var response = await _unitOfWork.Employee.CreateEmployee(employeeDto);
+                if (response)
                 {
-                    return BadRequest("Employee creation failed.");
+                    // Save changes to the database
+                    await _unitOfWork.CommitAsync();
+                    return Ok($"{employeeDto.AceId} {employeeDto.EmployeeName} added Successfully");
+
                 }
 
-                // Save changes to the database
-                await _unitOfWork.CommitAsync();
+                return BadRequest("Unable to Add New Employee");
 
-                return CreatedAtAction(nameof(GetEmployees), new { aceId = employee.AceId }, employee);
+            }
+            catch (AssessmentNotFoundException exception)
+            {
+                return BadRequest(exception.Message);
             }
             catch (Exception ex)
             {
