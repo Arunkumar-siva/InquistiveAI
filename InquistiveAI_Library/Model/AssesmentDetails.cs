@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace InquistiveAI_Library.Model
@@ -12,7 +13,7 @@ namespace InquistiveAI_Library.Model
     {
 
         [Key]
-        public int AssessmentId { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string QuestionName { get; set; }
@@ -30,8 +31,10 @@ namespace InquistiveAI_Library.Model
         public DateTime AssessmentUploadedDate { get; set; }
 
         [ForeignKey("BatchId")]
-        public virtual BatchDetails BatchDetails { get; set; } 
+        [JsonIgnore]
+        public virtual BatchDetails BatchDetails { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<EmployeeAssesmentDetails> EmployeeAssesments { get; set; }
     
     }

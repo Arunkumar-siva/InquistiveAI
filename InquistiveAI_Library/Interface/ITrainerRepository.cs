@@ -18,6 +18,8 @@ namespace InquistiveAI_Library.Interface
 
         Task<bool> UploadAssessmentAsync(AssessmentDetailDto assessmentDetailDto);
 
+        Task<List<AssesmentDetails>> GetAllAssessmentDetailsAync();
+
 
     }
 }
