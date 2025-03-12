@@ -1,13 +1,13 @@
-﻿using InquistiveAI_Library.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace InquisitiveAiLibrary.Model
+namespace InquistiveAI_Library.Model
 {
     public class EmployeeDetails
     {
@@ -26,16 +26,21 @@ namespace InquisitiveAiLibrary.Model
 
 
         [ForeignKey("BatchId")]
+        [JsonIgnore]
 
         public virtual BatchDetails BatchDetails { get; set; }
 
         [ForeignKey("RoleId")]
+        [JsonIgnore]
 
         public virtual Roles Roles { get; set; }
 
+        [JsonIgnore]
         public virtual Login Login { get; set; }
 
+        [JsonIgnore]
         public virtual EmployeeAssesmentDetails EmployeeAssessmentDetails{ get; set; } 
 
     }
 }
+    

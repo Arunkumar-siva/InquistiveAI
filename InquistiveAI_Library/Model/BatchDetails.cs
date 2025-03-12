@@ -1,9 +1,9 @@
-﻿using InquisitiveAiLibrary.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace InquistiveAI_Library.Model
@@ -17,10 +17,13 @@ namespace InquistiveAI_Library.Model
 
         public DateTime BatchMonth { get; set; }
 
-        public virtual AssesmentDetails AssesmentDetails { get; set; } 
+        [JsonIgnore]
+        public virtual AssesmentDetails AssesmentDetails { get; set; }
 
-        public virtual ICollection<EmployeeAssesmentDetails> EmployeeAssesmentDetails { get; set;} 
+        [JsonIgnore]
+        public virtual ICollection<EmployeeAssesmentDetails> EmployeeAssesmentDetails { get; set;}
 
+        [JsonIgnore]
         public virtual ICollection<EmployeeDetails> EmployeeDetails { get; set; }
 
     }

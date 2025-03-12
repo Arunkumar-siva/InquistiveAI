@@ -1,43 +1,158 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using InquistiveAI_Library.DTO;
+using InquistiveAI_Library.Interface;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
+// API Controller to handle Employee-related operations
 namespace InquistiveAI_Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        // GET: api/<EmployeeController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IUnitOfWork _unitOfWork;
+
+        public EmployeeController(IUnitOfWork unitOfWork)
         {
-            return new string[] { "value1", "value2" };
+            _unitOfWork = unitOfWork;
         }
 
-        // GET api/<EmployeeController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<EmployeeController>
+        /// <summary>
+        /// Creates a new employee record.
+        /// </summary>
+        /// <param name="employeeDto">Employee details DTO</param>
+        /// <returns>Returns the created employee object</returns>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeDetailsDto employeeDto)
         {
+            try
+            {
+                // Attempt to create a new employee record
+                var employee = await _unitOfWork.Employee.CreateEmployee(employeeDto);
+
+                // If creation fails, return a BadRequest response
+                if (employee == null)
+                {
+                    return BadRequest("Employee creation failed.");
+                }
+
+                // Save changes to the database
+                await _unitOfWork.CommitAsync();
+
+                return CreatedAtAction(nameof(GetEmployees), new { aceId = employee.AceId }, employee);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
         }
 
-        // PUT api/<EmployeeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        /// <summary>
+        /// Retrieves employees based on batchId and roleId filters.
+        /// </summary>
+        /// <param name="batchId">Optional batch ID filter</param>
+        /// <param name="roleId">Optional role ID filter</param>
+        /// <returns>List of employees matching the filters</returns>
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetEmployees([FromQuery] int? batchId, [FromQuery] int? roleId)
         {
+            try
+            {
+                // Ensuring at least one filtering parameter is provided
+                if (!batchId.HasValue && !roleId.HasValue)
+                {
+                    return BadRequest("Please provide at least one filter parameter: batchId or roleId.");
+                }
+
+                var employees = await _unitOfWork.Employee.GetEmployees(batchId, roleId);
+
+                if (employees == null || !employees.Any())
+                {
+                    return NotFound("No employees found with the given filters.");
+                }
+
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
         }
 
-        // DELETE api/<EmployeeController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        /// <summary>
+        /// Retrieves an employee by AceId.
+        /// </summary>
+        /// <param name="aceId">Unique identifier for the employee</param>
+        /// <returns>Employee details if found</returns>
+        [HttpGet("{aceId}")]
+        public async Task<IActionResult> GetEmployeeByAceId(string aceId)
         {
+            try
+            {
+                var employee = await _unitOfWork.Employee.GetEmployeeByAceId(aceId);
+                if (employee == null)
+                {
+                    return NotFound($"Employee with AceId {aceId} not found.");
+                }
+
+                return Ok(employee);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing employee record.
+        /// </summary>
+        /// <param name="aceId">Employee unique identifier</param>
+        /// <param name="updateDto">Updated employee details</param>
+        /// <returns>Updated employee object</returns>
+        [HttpPut("{aceId}")]
+        public async Task<IActionResult> UpdateEmployee(string aceId, [FromBody] EmployeeDetailsDto updateDto)
+        {
+            try
+            {
+                var updatedEmployee = await _unitOfWork.Employee.UpdateEmployee(aceId, updateDto);
+                if (updatedEmployee == null)
+                {
+                    return NotFound($"Employee with AceId {aceId} not found.");
+                }
+
+                // Save updated changes to the database
+                await _unitOfWork.CommitAsync();
+                return Ok(updatedEmployee);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Deletes an employee record.
+        /// </summary>
+        /// <param name="aceId">Employee unique identifier</param>
+        /// <returns>Success or failure response</returns>
+        [HttpDelete("{aceId}")]
+        public async Task<IActionResult> DeleteEmployee(string aceId)
+        {
+            try
+            {
+                var isDeleted = await _unitOfWork.Employee.DeleteEmployee(aceId);
+                if (!isDeleted)
+                {
+                    return NotFound($"Employee with AceId {aceId} not found.");
+                }
+
+                // Ensure the delete operation is committed
+                await _unitOfWork.CommitAsync();
+                return Ok($"Employee with AceId {aceId} deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
         }
     }
 }
