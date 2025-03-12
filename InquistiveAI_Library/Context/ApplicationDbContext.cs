@@ -1,5 +1,4 @@
-﻿using InquisitiveAiLibrary.Model;
-using InquistiveAI_Library.Model;
+﻿using InquistiveAI_Library.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

@@ -90,7 +90,7 @@ namespace InquistiveAI_Api.Controllers
                 return BadRequest("No File Uploaded");
             }
 
-            var response = this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
+            var response = await this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
             if(response)
             {
                 return Ok();

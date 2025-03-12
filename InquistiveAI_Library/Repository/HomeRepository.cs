@@ -1,5 +1,4 @@
-﻿using InquisitiveAiLibrary.Model;
-using InquistiveAI_Library.Constants;
+﻿using InquistiveAI_Library.Constants;
 using InquistiveAI_Library.Context;
 using InquistiveAI_Library.DTO;
 using InquistiveAI_Library.Exceptions;

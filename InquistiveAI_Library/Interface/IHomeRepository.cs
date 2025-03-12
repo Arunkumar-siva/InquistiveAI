@@ -1,5 +1,4 @@
-﻿using InquisitiveAiLibrary.Model;
-using InquistiveAI_Library.DTO;
+﻿using InquistiveAI_Library.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
