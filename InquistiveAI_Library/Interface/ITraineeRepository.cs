@@ -13,5 +13,7 @@ namespace InquistiveAI_Library.Interface
     {
      Task<EmployeeDetailsDTO> GetEmployeeDetailById(string aceId);
      Task<List<EmployeeAssessmentDto>> GetAssessmentDetailsById(string aceId);
+     Task<AssessmentDetailDto> GetAssessmentByAceId(string aceId);
+     Task<string> GetAssessmentFeedBack(string aceId);
     }
 }

@@ -1,4 +1,4 @@
-﻿﻿using InquisitiveAiLibrary.Model;
+﻿using InquisitiveAiLibrary.Model;
 using InquistiveAI_Library.Context;
 using InquistiveAI_Library.Interface;
 using InquistiveAI_Library.Model;
@@ -62,7 +62,7 @@ namespace InquistiveAI_Library.Repository
             if (employeeAssessment.Count() != 0)
             {
                 
-                  var EmployeeAssessment = employeeAssessment.Select(a => new EmployeeAssessmentDto
+                  var employeeAssessmentData = employeeAssessment.Select(a => new EmployeeAssessmentDto
                     {
                         AssessmentId = a.AssessmentId,
                         Status = a.Status,
@@ -70,12 +70,37 @@ namespace InquistiveAI_Library.Repository
                         Result = a.Result
                     }).ToList();
 
-                    return EmployeeAssessment;
+                    return employeeAssessmentData;
                     
             }
             return [];
 
     }
+    public async Task<AssessmentDetailDto> GetAssessmentByAceId(string aceId){
 
+        var employee = await this.GetEmployeeDetailById(aceId);
+        if(employee!=null){
+            var assessment = await this._context.AssesmentDetails.FirstOrDefaultAsync(assessment=> assessment.BatchId == employee.BatchId);
+            if(assessment !=null){
+                var assessmentData = new AssessmentDetailDto{
+                    QuestionName = assessment.QuestionName,
+                    BatchId = assessment.BatchId, 
+                    AssessmentUploadedDate = assessment.AssessmentUploadedDate
+                } ;
+                return assessmentData;
+            }
+        }
+            return new AssessmentDetailDto();
+  }
+public async Task<string> GetAssessmentFeedBack(string aceId){
+     var employee = await this.GetAssessmentDetailsById(aceId);
+        if(employee.Count()>0){
+            var result = await this._context.EmployeeAssesmentDetails.FirstOrDefaultAsync(assessment=> assessment.AssessmentId == employee[0].AssessmentId);
+            return result.Result;
+            }
+            else{
+                return "No Assessment Taken";
+            }
+}
     }
 }

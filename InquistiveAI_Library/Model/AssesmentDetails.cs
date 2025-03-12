@@ -13,7 +13,7 @@ namespace InquistiveAI_Library.Model
     {
 
         [Key]
-        public int Id { get; set; }
+        public int AssessmentId { get; set; }
 
         [Required]
         public string QuestionName { get; set; }

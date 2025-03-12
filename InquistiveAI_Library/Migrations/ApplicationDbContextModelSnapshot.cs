@@ -48,11 +48,11 @@ namespace InquistiveAI_Library.Migrations
 
             modelBuilder.Entity("InquistiveAI_Library.Model.AssesmentDetails", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AssessmentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssessmentId"));
 
                     b.Property<DateTime>("AssessmentUploadedDate")
                         .HasColumnType("datetime2");
@@ -72,7 +72,7 @@ namespace InquistiveAI_Library.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("AssessmentId");
 
                     b.HasIndex("BatchId")
                         .IsUnique();
@@ -220,7 +220,7 @@ namespace InquistiveAI_Library.Migrations
                         .IsRequired();
 
                     b.HasOne("InquistiveAI_Library.Model.AssesmentDetails", "AssesmentDetails")
-                        .WithMany()
+                        .WithMany("EmployeeAssesments")
                         .HasForeignKey("AssessmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -256,6 +256,11 @@ namespace InquistiveAI_Library.Migrations
 
                     b.Navigation("Login")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("InquistiveAI_Library.Model.AssesmentDetails", b =>
+                {
+                    b.Navigation("EmployeeAssesments");
                 });
 
             modelBuilder.Entity("InquistiveAI_Library.Model.BatchDetails", b =>
