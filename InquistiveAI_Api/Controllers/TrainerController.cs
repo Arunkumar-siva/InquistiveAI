@@ -2,6 +2,7 @@
 using InquistiveAI_Library.Exceptions;
 using InquistiveAI_Library.Interface;
 using InquistiveAI_Library.Model;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -44,15 +45,22 @@ namespace InquistiveAI_Api.Controllers
 
         public async Task<ActionResult> GetAllBatches()
         {
-            var response = await this._unitOfWork.Trainer.GetAllBatchesAsync();
-
-            if (response != null)
+            try
             {
-                return Ok(response);
+
+                var response = await this._unitOfWork.Trainer.GetAllBatchesAsync();
+
+                if (response != null)
+                {
+                    return Ok(response);
+                }
+                return NotFound("Unable to Get Batch Details");
 
             }
-            return new NoContentResult();
-
+            catch (Exception exception)
+            {
+                return StatusCode(500, new { error = "An Unexpected Error Occured", details = exception.Message });
+            }
         }
 
         [HttpPut("EditBatchDetail/{batchId}")]
@@ -85,18 +93,50 @@ namespace InquistiveAI_Api.Controllers
 
         public async Task<IActionResult> UploadAssessment([FromForm] AssessmentDetailDto assessmentDetailDto)
         {
-            if( assessmentDetailDto.AssessmentFile == null || assessmentDetailDto.AssessmentFile.Length == 0)
+            try
             {
-                return BadRequest("No File Uploaded");
+                if (assessmentDetailDto.AssessmentFile == null || assessmentDetailDto.AssessmentFile.Length == 0)
+                {
+                    return BadRequest("No File Uploaded");
+                }
+
+                var response = await this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
+                if (response)
+                {
+                    await this._unitOfWork.CommitAsync();
+                    return Ok($"{assessmentDetailDto.QuestionName} Added Successfully");
+                }
+
+                return BadRequest("Unable to Upload Assessment");
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(500, new { error = "An Unexpected Error Occured", details = exception.Message });
+            }
+        }
+
+        [HttpGet("ViewAllAssessmentDetails")]
+
+        public async Task<IActionResult> ViewAssessmentDetails()
+        {
+            try
+            {
+                var response = await this._unitOfWork.Trainer.GetAllAssessmentDetailsAync();
+                if (response != null)
+                {
+                    return Ok(response);
+                }
+                
+                return NotFound("Unable to Get Assessment Details");
+
             }
 
-            var response = await this._unitOfWork.Trainer.UploadAssessmentAsync(assessmentDetailDto);
-            if(response)
+            catch (Exception exception)
             {
-                return Ok();
-            }
 
-            return BadRequest();
+                return StatusCode(500, new { error = "An Unexpected Error Occured", details = exception.Message });
+
+            }
         }
     }
 }

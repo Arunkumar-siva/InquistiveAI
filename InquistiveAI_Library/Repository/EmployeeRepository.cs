@@ -11,6 +11,7 @@ using InquistiveAI_Library.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 
+
 namespace InquistiveAI_Library.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
@@ -47,8 +48,6 @@ namespace InquistiveAI_Library.Repository
             };
 
             await _context.Login.AddAsync(login);
-            await _context.SaveChangesAsync();
-
             return employee;
         }
 

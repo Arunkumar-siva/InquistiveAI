@@ -1,43 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using InquistiveAI_Library.Interface;
+using InquistiveAI_Library.DTO;
 
 namespace InquistiveAI_Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class TraineeController : ControllerBase
     {
-        // GET: api/<TraineeController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+         private readonly ITraineeRepository _traineeRepository;
+
+        public TraineeController(ITraineeRepository traineeRepository)
         {
-            return new string[] { "value1", "value2" };
+            this._traineeRepository = traineeRepository;
         }
 
-        // GET api/<TraineeController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("api/dashBoard/{aceId}")]
+        
+        public Task<EmployeeDetailsDto> GetEmployeeDetailById(string aceId)
         {
-            return "value";
+            return this._traineeRepository.GetEmployeeDetailById(aceId);
         }
 
-        // POST api/<TraineeController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+         [HttpGet("api/assessment/{aceId}")]
+        
+        public Task<List<EmployeeAssessmentDto>> GetAssessmentDetailsById(string aceId)
         {
+            return this._traineeRepository.GetAssessmentDetailsById(aceId);
         }
 
-        // PUT api/<TraineeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
 
-        // DELETE api/<TraineeController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

@@ -4,7 +4,6 @@ using InquistiveAI_Library.Exceptions;
 using InquistiveAI_Library.Interface;
 using InquistiveAI_Library.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +37,12 @@ namespace InquistiveAI_Library.Repository
             return false;
         }
 
+        public async Task<List<AssesmentDetails>> GetAllAssessmentDetailsAync()
+        {
+            var assessmentDetails = await this._applicationDbContext.AssesmentDetails.ToListAsync();
+            return assessmentDetails ?? null!;           
+        }
+
         public async Task<List<BatchDetails>> GetAllBatchesAsync()
         {
             var batchDetails = await this._applicationDbContext.BatchDetails.Select(batch => new BatchDetails
@@ -46,10 +51,8 @@ namespace InquistiveAI_Library.Repository
                 BatchName = batch.BatchName,
                 BatchMonth = batch.BatchMonth
             }).ToListAsync();
-
-
-            return batchDetails;
-
+           
+            return batchDetails ?? null!;
 
         }
 
@@ -86,7 +89,6 @@ namespace InquistiveAI_Library.Repository
 
             await this._applicationDbContext.AssesmentDetails.AddAsync(assessmentDetails);
             return true;
-
 
         }
     }
